@@ -1,6 +1,7 @@
 from flask import jsonify
 from flask_jwt_extended import (create_access_token, get_jwt_identity,
-                                jwt_required, set_access_cookies)
+                                jwt_required, set_access_cookies,
+                                unset_jwt_cookies)
 from flask_restful import Resource, reqparse
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -82,6 +83,16 @@ class Login(Resource):
         response = jsonify({'status': 'Login success'})
 
         set_access_cookies(response, access_token)
+
+        return response
+
+
+class Logout(Resource):
+
+    def delete(self):
+        response = jsonify({'status': 'Logout success'})
+
+        unset_jwt_cookies(response)
 
         return response
 

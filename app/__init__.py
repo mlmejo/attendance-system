@@ -16,9 +16,9 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['JWT_SECRET_KEY'] = 'secret-key'
     app.config['JWT_COOKIE_HTTPONLY'] = True
-    app.config['JWT_COOKIE_SECURE'] = True
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
+    app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 
     db.init_app(app)
     CORS(app, supports_credentials=True)
@@ -26,10 +26,11 @@ def create_app():
 
     api = Api(app)
 
-    from .resources import CurrentUser, Login, Register
+    from .resources import CurrentUser, Login, Logout, Register
 
     api.add_resource(Login, '/api/auth/login')
     api.add_resource(Register, '/api/auth/register')
+    api.add_resource(Logout, '/api/auth/logout')
     api.add_resource(CurrentUser, '/api/users/me')
 
     return app

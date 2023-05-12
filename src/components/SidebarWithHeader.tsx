@@ -1,39 +1,41 @@
-import { ReactNode } from "react";
 import {
-  IconButton,
   Avatar,
   Box,
+  BoxProps,
   CloseButton,
-  Flex,
-  HStack,
-  VStack,
-  Icon,
-  useColorModeValue,
-  Link,
   Drawer,
   DrawerContent,
-  Text,
-  useDisclosure,
-  BoxProps,
+  Flex,
   FlexProps,
+  HStack,
+  Icon,
+  IconButton,
+  Link,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
   Stack,
+  Text,
+  VStack,
+  useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
+import { MouseEvent, ReactNode } from "react";
 import { IconType } from "react-icons";
-import { User } from "../types";
+import { FiBell, FiChevronDown, FiMenu } from "react-icons/fi";
 
+import axios from "axios";
 import {
   FaChalkboardTeacher,
   FaGraduationCap,
   FaHome,
   FaTasks,
 } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { User } from "../types";
 
 interface LinkItemProps {
   name: string;
@@ -48,13 +50,14 @@ const LinkItems: Array<LinkItemProps> = [
 ];
 
 export default function SidebarWithHeader({
-  user,
   children,
 }: {
-  user: User | null;
   children: ReactNode;
 }) {
+  const [user, _] = useAuth();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
       <SidebarContent
@@ -141,8 +144,8 @@ const NavItem = ({ icon, active, children, ...rest }: NavItemProps) => {
         bg={active ? "blue.400" : "white"}
         color={active ? "white" : "black"}
         _hover={{
-          bg: "blue.400",
-          color: "white",
+          bg: "gray.200",
+          color: "black",
         }}
         {...rest}
       >
@@ -151,7 +154,7 @@ const NavItem = ({ icon, active, children, ...rest }: NavItemProps) => {
             mr="4"
             fontSize="16"
             _groupHover={{
-              color: "white",
+              color: "black",
             }}
             as={icon}
           />
@@ -167,6 +170,19 @@ interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 const MobileNav = ({ user, onOpen, ...rest }: MobileProps) => {
+  const navigate = useNavigate();
+
+  const logout = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    axios
+      .delete("http://localhost:5000/api/auth/logout", {
+        withCredentials: true,
+      })
+      .then(() => navigate("/login"))
+      .catch((error) => console.error(error));
+  };
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -236,7 +252,9 @@ const MobileNav = ({ user, onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem as="a" href="/logout" onClick={logout}>
+                Sign out
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>

@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function Register() {
   const [data, setData] = useState({
@@ -25,6 +26,8 @@ export default function Register() {
     confirmPassword: "",
   });
 
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const submit = (e: FormEvent) => {
@@ -32,7 +35,7 @@ export default function Register() {
 
     axios
       .post("http://127.0.0.1:5000/api/auth/register", data)
-      .then((response) => console.log(response))
+      .then(() => navigate("/login"))
       .catch((error) => console.error(error));
   };
 

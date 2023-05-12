@@ -12,8 +12,9 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 export default function Login() {
   const [data, setData] = useState({
@@ -23,16 +24,22 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const [user, isLoading] = useAuth();
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      navigate("/dashboard");
+    }
+  }, [user, isLoading]);
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
 
     axios
-      .post("http://127.0.0.1:5000/api/auth/login", data, {
+      .post("http://localhost:5000/api/auth/login", data, {
         withCredentials: true,
       })
-      .then(() => {
-        return navigate("/dashboard");
-      })
+      .then(() => navigate("/dashboard"))
       .catch((error) => console.error(error));
   };
 
